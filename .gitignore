@@ -5,6 +5,6 @@ openmp
 original_noopt.o
 original_noopt
 simd.o
-imd
+simd
 advanced.o
 advanced

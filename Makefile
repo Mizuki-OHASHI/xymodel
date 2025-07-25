@@ -40,11 +40,11 @@ simd: simd.o
 simd.o: simd.c
 	$(CC) $(CSIMDTAG) -c simd.c -o simd.o
 
-# --- advanced ---
-advanced: advanced.o
-	$(CC) $(CTAG) -o advanced advanced.o -lm
-advanced.o: advanced.c
-	$(CC) $(CTAG) -c advanced.c -o advanced.o
+# # --- advanced ---
+# advanced: advanced.o
+# 	$(CC) $(CTAG) -o advanced advanced.o -lm
+# advanced.o: advanced.c
+# 	$(CC) $(CTAG) -c advanced.c -o advanced.o
 
 clean:
 	rm original.o original openmp.o openmp original_noopt.o original_noopt simd.o simd advanced.o advanced

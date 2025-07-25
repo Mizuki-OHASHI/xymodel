@@ -1,0 +1,28 @@
+<version
+original
+version>
+<input_parameters
+N_SITES=1024 N_REPLICAS=16 NX=32 NY=32 N_SAMPLING=1000 SAMPLE_INTERVAL_SWEEPS=100 THERMALIZATION_SWEEPS=10000
+min_beta=0.400000 max_beta=1.900000
+input_parameters>
+<helicity_modulus_results
+replica=0 beta=0.400000 energy_per_site=-0.473637 helicity_modulus=0.006473
+replica=1 beta=0.500000 energy_per_site=-0.422769 helicity_modulus=-0.002758
+replica=2 beta=0.600000 energy_per_site=-0.636510 helicity_modulus=-0.008760
+replica=3 beta=0.700000 energy_per_site=-0.809993 helicity_modulus=0.012121
+replica=4 beta=0.800000 energy_per_site=-1.010090 helicity_modulus=0.009457
+replica=5 beta=0.900000 energy_per_site=-1.154402 helicity_modulus=0.039719
+replica=6 beta=1.000000 energy_per_site=-1.398547 helicity_modulus=0.468948
+replica=7 beta=1.100000 energy_per_site=-1.473793 helicity_modulus=0.624216
+replica=8 beta=1.200000 energy_per_site=-1.488001 helicity_modulus=0.692166
+replica=9 beta=1.300000 energy_per_site=-1.568763 helicity_modulus=0.736970
+replica=10 beta=1.400000 energy_per_site=-1.587415 helicity_modulus=0.769395
+replica=11 beta=1.500000 energy_per_site=-1.628379 helicity_modulus=0.793279
+replica=12 beta=1.600000 energy_per_site=-1.643522 helicity_modulus=0.809796
+replica=13 beta=1.700000 energy_per_site=-1.694010 helicity_modulus=0.824969
+replica=14 beta=1.800000 energy_per_site=-1.709284 helicity_modulus=0.837440
+replica=15 beta=1.900000 energy_per_site=-1.731578 helicity_modulus=0.847754
+helicity_modulus_results>
+<execution_time
+25.0012
+execution_time>

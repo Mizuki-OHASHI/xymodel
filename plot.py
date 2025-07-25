@@ -8,7 +8,7 @@ def main():
         return
 
     data_file = argv[1]
-    with open(data_file, "r") as f:
+    with open(f"data/{data_file}", "r") as f:
         lines = f.readlines()
 
     data = {}

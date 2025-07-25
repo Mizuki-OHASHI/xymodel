@@ -5,6 +5,8 @@
 #include <math.h>
 #include <time.h>
 #include <sys/time.h>
+#include <omp.h>
+#include "pcg_variants.h"
 
 #define NX 32                       // 格子のXサイズ
 #define NY 32                       // 格子のYサイズ
@@ -97,7 +99,7 @@ void initialize_replicas(Replica *replicas, int n_replicas, int nx, int ny, cons
  * @param rep 更新するレプリカへのポインタ
  * @note 全てのスピンサイトを0からN_SITES-1まで順番に1回ずつ更新します。
  */
-void metropolis_sweep(Replica *rep)
+void metropolis_sweep(Replica *rep, pcg32_random_t *rng)
 {
   const int N_SITES = rep->nx * rep->ny;
   const float DELTA = 1.0f; // スピン角度の更新幅
@@ -134,8 +136,8 @@ void metropolis_sweep(Replica *rep)
         neighborsD[r] = rep->spin[((iy + 1) % rep->ny) * rep->nx + ix];           // Down
         neighborsU[r] = rep->spin[((iy - 1 + rep->ny) % rep->ny) * rep->nx + ix]; // Up
 
-        rand_val_delta[r] = (float)rand() / (float)RAND_MAX; // generate random value for delta
-        rand_val_acc[r] = (float)rand() / (float)RAND_MAX;   // generate random value for acceptance
+        rand_val_delta[r] = (float)pcg32_random_r(rng) / (float)UINT32_MAX;
+        rand_val_acc[r] = (float)pcg32_random_r(rng) / (float)UINT32_MAX;
       }
 
       // update spins
@@ -270,6 +272,12 @@ int main(int argc, char *argv[])
 
   // 2. 初期化
   srand(48);
+  int max_threads = omp_get_max_threads();
+  pcg32_random_t rngs[max_threads];
+  for (i = 0; i < max_threads; ++i)
+  {
+    pcg32_srandom_r(&rngs[i], time(NULL), (intptr_t)&rngs[i]);
+  }
   initialize_replicas(replicas, N_REPLICAS, NX, NY, betas);
 
   // 全レプリカの物理量を格納する配列
@@ -288,7 +296,7 @@ int main(int argc, char *argv[])
 #pragma omp parallel for
     for (i = 0; i < N_REPLICAS; ++i)
     {
-      metropolis_sweep(&replicas[i]);
+      metropolis_sweep(&replicas[i], &rngs[omp_get_thread_num()]);
     }
 
     // レプリカ交換
