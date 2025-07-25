@@ -1,0 +1,12 @@
+on my Mac
+
+original
+48.9795
+
+parallelize metropolis sweep for each replica with OpenMP
+19.8059
+#pragma omp parallel for
+for (i = 0; i < N_REPLICAS; ++i)
+{
+  metropolis_sweep(&replicas[i]);
+}
