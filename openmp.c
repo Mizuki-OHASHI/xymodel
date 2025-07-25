@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  fprintf(fp, "<version\noriginal\nversion>\n");
+  fprintf(fp, "<version\nopenmp\nversion>\n");
 
   fprintf(fp, "<input_parameters\n");
   fprintf(fp, "N_SITES=%d N_REPLICAS=%d NX=%d NY=%d N_SAMPLING=%d SAMPLE_INTERVAL_SWEEPS=%d THERMALIZATION_SWEEPS=%d\n",
@@ -345,6 +345,8 @@ int main(int argc, char *argv[])
   wall_time = (end_time.tv_sec - start_time.tv_sec) +
               (end_time.tv_usec - start_time.tv_usec) / 1000000.0;
   fprintf(fp, "<execution_time\n%.4f\nexecution_time>\n", wall_time);
+
+  fclose(fp);
 
   return 0;
 }

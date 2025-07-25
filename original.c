@@ -337,5 +337,7 @@ int main(int argc, char *argv[])
               (end_time.tv_usec - start_time.tv_usec) / 1000000.0;
   fprintf(fp, "<execution_time\n%.4f\nexecution_time>\n", wall_time);
 
+  fclose(fp);
+
   return 0;
 }

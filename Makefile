@@ -8,13 +8,7 @@ CSIMDTAG = -Xpreprocessor -fopenmp -Rpass=loop-vectorize -march=native -ffast-ma
 # CTAG = -Kfast -Kopenmp
 # CSIMDTAG = -Kfast -Kopenmp -Ksimd
 
-default: original_noopt original openmp simd advanced
-
-# --- template ---
-# main: main.o
-# 	$(CC) $(CTAG) -o main main.o -lm
-# main.o: main.c
-# 	$(CC) $(CTAG) -c main.c
+default: original_noopt original openmp simd simdv2
 
 # --- original without optimization ---
 original_noopt: original_noopt.o
@@ -46,5 +40,10 @@ simd.o: simd.c
 # advanced.o: advanced.c
 # 	$(CC) $(CTAG) -c advanced.c -o advanced.o
 
+simdv2: simdv2.o
+	$(CC) $(CSIMDTAG) -o simdv2 simdv2.o -lm
+simdv2.o: simdv2.c
+	$(CC) $(CSIMDTAG) -c simdv2.c -o simdv2.o
+
 clean:
-	rm original.o original openmp.o openmp original_noopt.o original_noopt simd.o simd advanced.o advanced
+	rm original.o original openmp.o openmp original_noopt.o original_noopt simd.o simd simdv2.o simdv2

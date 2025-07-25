@@ -97,7 +97,7 @@ void initialize_replicas(Replica *replicas, int n_replicas, int nx, int ny, cons
 /**
  * @brief 1つのレプリカに対して1モンテカルロスイープを実行する (メトロポリス法)
  * @param rep 更新するレプリカへのポインタ
- * @note 全てのスピンサイトを0からN_SITES-1まで順番に1回ずつ更新します。
+ * @note 全てのスピンサイトを更新します
  */
 void metropolis_sweep(Replica *rep, pcg32_random_t *rng)
 {
@@ -140,7 +140,6 @@ void metropolis_sweep(Replica *rep, pcg32_random_t *rng)
         rand_val_acc[r] = (float)pcg32_random_r(rng) / (float)UINT32_MAX;
       }
 
-      // update spins
 #pragma omp simd
       for (int r = 0; r < NL; ++r)
       {
@@ -157,7 +156,7 @@ void metropolis_sweep(Replica *rep, pcg32_random_t *rng)
         accept[r] = (delta_e[r] < 0.0f || rand_val_acc[r] < expf(-rep->beta * delta_e[r]));
       }
 
-      // store results back to replica
+      // scatter store
       for (int r = 0; r < NL; ++r)
       {
         int idx = site_idx + r * 2;
@@ -257,7 +256,7 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  fprintf(fp, "<version\noriginal\nversion>\n");
+  fprintf(fp, "<version\nsimd\nversion>\n");
 
   fprintf(fp, "<input_parameters\n");
   fprintf(fp, "N_SITES=%d N_REPLICAS=%d NX=%d NY=%d N_SAMPLING=%d SAMPLE_INTERVAL_SWEEPS=%d THERMALIZATION_SWEEPS=%d\n",
@@ -381,6 +380,8 @@ int main(int argc, char *argv[])
   wall_time = (end_time.tv_sec - start_time.tv_sec) +
               (end_time.tv_usec - start_time.tv_usec) / 1000000.0;
   fprintf(fp, "<execution_time\n%.4f\nexecution_time>\n", wall_time);
+
+  fclose(fp);
 
   return 0;
 }

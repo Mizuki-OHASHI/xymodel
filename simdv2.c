@@ -24,13 +24,11 @@
  */
 typedef struct
 {
-  // float *spin;  // スピンの角度θを格納する配列 (サイズ: N_SITES)
-  float *spinodd, *spineven;
+  float *spin;  // スピンの角度θを格納する配列 (サイズ: N_SITES)
   float beta;   // このレプリカの逆温度 β = 1/T
   float energy; // このレプリカの現在のエネルギー
   int nx;       // 格子のX方向のサイズ
   int ny;       // 格子のY方向のサイズ
-  int nxh, nyh; // nx/2, ny/2
 } Replica;
 
 /**
@@ -43,20 +41,19 @@ float calculate_total_energy(Replica *rep)
 {
   float total_energy = 0.0f;
   const int N_SITES = rep->nx * rep->ny;
-  const int N_SITES_HALF = N_SITES / 2;
 
-  for (int i = 0; i < N_SITES_HALF; ++i)
+  for (int i = 0; i < N_SITES; ++i)
   {
-    int ix = i % rep->nxh;
-    int iy = i / rep->nxh;
+    int ix = i % rep->nx;
+    int iy = i / rep->nx;
 
-    // interaction with right neighbor
-    total_energy -= J * cosf(rep->spinodd[i] - rep->spineven[i]);
-    total_energy -= J * cosf(rep->spineven[iy * rep->nxh + (ix + 1) % rep->nxh] - rep->spinodd[i]);
+    // 右の隣接スピンとの相互作用
+    int right_neighbor_idx = iy * rep->nx + (ix + 1) % rep->nx;
+    total_energy -= J * cosf(rep->spin[i] - rep->spin[right_neighbor_idx]);
 
-    // interaction with down neighbor
-    total_energy -= J * cosf(rep->spinodd[i] - rep->spineven[((iy + 1) % rep->nyh) * rep->nxh + ix]);
-    total_energy -= J * cosf(rep->spineven[i] - rep->spinodd[((iy + 1) % rep->nyh) * rep->nxh + (ix + 1) % rep->nxh]);
+    // 下の隣接スピンとの相互作用
+    int down_neighbor_idx = ((iy + 1) % rep->ny) * rep->nx + ix;
+    total_energy -= J * cosf(rep->spin[i] - rep->spin[down_neighbor_idx]);
   }
   return total_energy;
 }
@@ -100,7 +97,7 @@ void initialize_replicas(Replica *replicas, int n_replicas, int nx, int ny, cons
 /**
  * @brief 1つのレプリカに対して1モンテカルロスイープを実行する (メトロポリス法)
  * @param rep 更新するレプリカへのポインタ
- * @note 全てのスピンサイトを0からN_SITES-1まで順番に1回ずつ更新します。
+ * @note 全てのスピンサイトを更新します
  */
 void metropolis_sweep(Replica *rep, pcg32_random_t *rng)
 {
@@ -143,7 +140,7 @@ void metropolis_sweep(Replica *rep, pcg32_random_t *rng)
         rand_val_acc[r] = (float)pcg32_random_r(rng) / (float)UINT32_MAX;
       }
 
-      // update spins
+      // scatter store
 #pragma omp simd
       for (int r = 0; r < NL; ++r)
       {
@@ -260,7 +257,7 @@ int main(int argc, char *argv[])
     return EXIT_FAILURE;
   }
 
-  fprintf(fp, "<version\noriginal\nversion>\n");
+  fprintf(fp, "<version\nsimd\nversion>\n");
 
   fprintf(fp, "<input_parameters\n");
   fprintf(fp, "N_SITES=%d N_REPLICAS=%d NX=%d NY=%d N_SAMPLING=%d SAMPLE_INTERVAL_SWEEPS=%d THERMALIZATION_SWEEPS=%d\n",
@@ -384,6 +381,8 @@ int main(int argc, char *argv[])
   wall_time = (end_time.tv_sec - start_time.tv_sec) +
               (end_time.tv_usec - start_time.tv_usec) / 1000000.0;
   fprintf(fp, "<execution_time\n%.4f\nexecution_time>\n", wall_time);
+
+  fclose(fp);
 
   return 0;
 }
